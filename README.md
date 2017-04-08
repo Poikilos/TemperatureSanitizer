@@ -21,6 +21,9 @@ desired_total_seconds = 120 * 60
 ```bash
 # cd to the directory where you saved the py file, then:
 sudo python TemperatureSanitizer
+# Or, run without sudo if you have changed the permissions of your USB device.
+# NOTE: sometimes that setting is forgotten when the device is unplugged and
+# reinserted, even if same port is used.
 ```
 
 
