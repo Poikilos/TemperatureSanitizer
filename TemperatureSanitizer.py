@@ -1,3 +1,13 @@
+#!/usr/bin/env python
+#region User Settings
+desired_degrees = 120
+desired_format = "fahrenheit"
+interval_seconds = 60
+desired_total_seconds = 120 * 60
+#endregion User Settings
+
+settings_howto_msg="#These settings are in the TemperatureSanitizer.py file in the User Settings region."
+
 import time
 try:
     from temperusb import TemperDevice, TemperHandler
@@ -14,72 +24,88 @@ th = None
 try:
     th = TemperHandler()
 except:
-    print("You have no permission to the usb device. Please run this python script with sudo or search online for linux usb permissions.")
+    print("A TEMPerV1 compatible device is not plugged in, or you have no permission to the usb device. Try running this script with sudo (sudo python TemperatureSanitizer.py) or search online for linux usb permissions.")
     exit(2)
 tds = th.get_devices()
-this_count = 0
-this_total = 0
-desired_degrees = 120
-desired_format = "fahrenheit"
-desired_interval_seconds = 60
-desired_total_seconds = 120 * 60
+current_span_temperatures_count = 0
+current_span_temperatures_total_temperature = 0
 
-class TimeStretch:
+
+class TSBake:
     def __init__(self):
         self.temperatures = list()
         self.total_seconds = 0
+        self.warmup_seconds = None
 
-good_stretches = list()
-bad_stretches = list()
+complete_bakes = list()
+incomplete_bakes = list()
 
-this_stretch = TimeStretch()
-this_temperatures = list()
+current_bake = TSBake()
+current_temperatures = list()
+warmup_seconds = 0
 if (len(tds)>0):
-    print("This program will show minimum temperature every "+str(desired_interval_seconds)+" second(s), whether that span met (>=) the desired minimum, and will tell you after the temperature has been the desired minimum of "+str(desired_degrees)+" "+desired_format+" for any continuous stretch of "+str(desired_total_seconds/60)+" minutes (which is "+str(desired_total_seconds)+" seconds)"+".")
-    print("Please wait...")
+    print("interval_seconds: "+str(interval_seconds))
+    print("desired_degrees: "+str(desired_degrees))
+    print("desired_format: "+str(desired_format))
+    print("#Bake starts after desired_degrees is reached:")
+    print("desired_bake_seconds: "+str(desired_total_seconds))
+    print("#desired_bake_minutes: "+str(desired_total_seconds/60))
+    print("")
+    print("#This program will show minimum temperature every "+str(interval_seconds)+" second(s), whether that span's minimum met (>=) the desired minimum, and will tell you after the temperature has been the desired minimum of "+str(desired_degrees)+" "+desired_format+" for any continuous stretch of "+str(desired_total_seconds/60)+" minutes"+".")
+    print(settings_howto_msg)
+    print("#Please wait...")
     while (True):
         this_temp = tds[0].get_temperature(format=desired_format)
-        this_count += 1
-        this_total += this_temp
-        this_temperatures.append(this_temp)
-        if this_count >= desired_interval_seconds:
-            this_avg = this_total / this_count
-            this_min = min(this_temperatures)
-            del this_temperatures[:]
+        current_span_temperatures_count += 1
+        current_span_temperatures_total_temperature += this_temp
+        current_temperatures.append(this_temp)
+        if current_span_temperatures_count >= interval_seconds:
+            this_avg = current_span_temperatures_total_temperature / current_span_temperatures_count
+            this_min = min(current_temperatures)
+            del current_temperatures[:]
             met_msg = "(< "+str(desired_degrees)+") "
             if (this_min >= desired_degrees):
-                this_stretch.temperatures.append(this_min)
-                this_stretch.total_seconds += this_count
+                current_bake.temperatures.append(this_min)
+                current_bake.total_seconds += current_span_temperatures_count
                 met_msg = "(>= "+str(desired_degrees)+") "
-                if (this_stretch.total_seconds>=desired_total_seconds):
-                    good_stretches.append(this_stretch)
-                    this_stretch = TimeStretch()
+                if (current_bake.total_seconds>=desired_total_seconds):
+                    complete_bakes.append(current_bake)
+                    current_bake = TSBake()
+                    current_bake.warmup_seconds = warmup_seconds
             else:
-                if len(this_stretch.temperatures) > 0:
-                    if (this_stretch.total_seconds<desired_total_seconds):
-                        bad_stretches.append(this_stretch)
-                        this_stretch = TimeStretch()
+                if len(current_bake.temperatures) > 0:
+                    if (current_bake.total_seconds<desired_total_seconds):
+                        incomplete_bakes.append(current_bake)
+                        current_bake = TSBake()
+                        current_bake.warmup_seconds = warmup_seconds
                     else:
-                        good_stretches.append(this_stretch)
-                        this_stretch = TimeStretch()
+                        print("#Logic error detected (this should never happen): program did not end when bake was successful (appending bake to complete_bakes anyway).")
+                        complete_bakes.append(current_bake)
+                        current_bake = TSBake()
+                        current_bake.warmup_seconds = warmup_seconds
                     
-            print(met_msg+"Last "+str(this_count)+" second(s) average:"+str(this_avg)+"; minimum:"+str(this_min))
-            this_count = 0
-            this_total = 0
-            if (len(good_stretches)>0):
-                print("Baking is finished: ")
+            print("#"+met_msg+"Last "+str(current_span_temperatures_count)+" second(s) average:"+str(this_avg)+"; minimum:"+str(this_min))
+            current_span_temperatures_count = 0
+            current_span_temperatures_total_temperature = 0
+            if (len(complete_bakes)>0):
+                print("#Baking is finished: ")
                 break
         time.sleep(1)
+        warmup_seconds += 1
 
-    print("Complete bake(s):")
-    for stretch in good_stretches:
-        print("  - Temperatures: "+str(stretch.temperatures))
-        print("    seconds: "+str(stretch.total_seconds))
-    print()
-    print("Incomplete bake(s):")
-    for stretch in bad_stretches:
-        print("  - Temperatures: "+str(stretch.temperatures))
-        print("    seconds: "+str(stretch.total_seconds))
+    print("incomplete_bakes:")
+    for stretch in incomplete_bakes:
+        print("  - minimum_temperatures: "+str(stretch.temperatures))
+        print("    warmup_time_minutes: "+str(stretch.warmup_seconds/60))
+        print("    bake_minutes: "+str(stretch.total_seconds/60))
+    print("complete_bakes:")
+    for stretch in complete_bakes:
+        print("  - minimum_temperatures: "+str(stretch.temperatures))
+        print("    warmup_time_minutes: "+str(stretch.warmup_seconds/60))
+        print("    bake_minutes: "+str(stretch.total_seconds/60))
+    print("incomplete_bakes_count: "+str(len(incomplete_bakes)))
+    print("complete_bakes_count: "+str(len(complete_bakes)))
+    print("")
 
 else:
     print("No TEMPer device found.")
