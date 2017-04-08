@@ -13,6 +13,7 @@ desired_format = "fahrenheit"
 interval_seconds = 60
 desired_total_seconds = 120 * 60
 ```
+Description of settings:
     * desired_format can be "fahrenheit" or "celcius".
     * The interval may need to be at least a few seconds for accuracy, though an interval of 1 can be used if you don't mind having all that data, and your sensor is accurate enough for that type of use (trusting a single reading as part of your raw data).
     * The seconds will start counting when the minimum temperature of the interval is at least desired_degrees. If the total number of seconds of bake time is reached (when there was a consecutive set of spans where the minimum never was below desired_degrees), the program will end and show a summary (including a list of temperatures, each of which is the minimum temperature of each consecutive interval that had the desired temperature as its minimum). Otherwise, the program will continue collecting data indefinitely.
