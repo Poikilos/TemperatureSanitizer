@@ -51,7 +51,7 @@ if (len(tds)>0):
     print("desired_bake_seconds: "+str(desired_total_seconds))
     print("#desired_bake_minutes: "+str(desired_total_seconds/60))
     print("")
-    print("#This program will show minimum temperature every "+str(interval_seconds)+" second(s), whether that span's minimum met (>=) the desired minimum, and will tell you after the temperature has been the desired minimum of "+str(desired_degrees)+" "+desired_format+" for any continuous stretch of "+str(desired_total_seconds/60)+" minutes"+".")
+    print("#This program will show minimum temperature every "+str(interval_seconds)+" second(s), whether that span's minimum met (>=) the desired minimum, and will tell you after the temperature has been the desired minimum of "+str(desired_degrees)+" "+desired_format+" met continuously for "+str(desired_total_seconds/60)+" minutes"+".")
     print(settings_howto_msg)
     print("#Please wait...")
     while (True):
@@ -69,20 +69,20 @@ if (len(tds)>0):
                 current_bake.total_seconds += current_span_temperatures_count
                 met_msg = "(>= "+str(desired_degrees)+") "
                 if (current_bake.total_seconds>=desired_total_seconds):
+                    current_bake.warmup_seconds = warmup_seconds
                     complete_bakes.append(current_bake)
                     current_bake = TSBake()
-                    current_bake.warmup_seconds = warmup_seconds
             else:
                 if len(current_bake.temperatures) > 0:
                     if (current_bake.total_seconds<desired_total_seconds):
+                        current_bake.warmup_seconds = warmup_seconds
                         incomplete_bakes.append(current_bake)
                         current_bake = TSBake()
-                        current_bake.warmup_seconds = warmup_seconds
                     else:
                         print("#Logic error detected (this should never happen): program did not end when bake was successful (appending bake to complete_bakes anyway).")
+                        current_bake.warmup_seconds = warmup_seconds
                         complete_bakes.append(current_bake)
                         current_bake = TSBake()
-                        current_bake.warmup_seconds = warmup_seconds
                     
             print("#"+met_msg+"Last "+str(current_span_temperatures_count)+" second(s) average:"+str(this_avg)+"; minimum:"+str(this_min))
             current_span_temperatures_count = 0
@@ -94,15 +94,15 @@ if (len(tds)>0):
         warmup_seconds += 1
 
     print("incomplete_bakes:")
-    for stretch in incomplete_bakes:
-        print("  - minimum_temperatures: "+str(stretch.temperatures))
-        print("    warmup_time_minutes: "+str(stretch.warmup_seconds/60))
-        print("    bake_minutes: "+str(stretch.total_seconds/60))
+    for bake in incomplete_bakes:
+        print("  - minimum_temperatures: "+str(bake.temperatures))
+        print("    warmup_time_minutes: "+str(bake.warmup_seconds/60))
+        print("    bake_minutes: "+str(bake.total_seconds/60))
     print("complete_bakes:")
-    for stretch in complete_bakes:
-        print("  - minimum_temperatures: "+str(stretch.temperatures))
-        print("    warmup_time_minutes: "+str(stretch.warmup_seconds/60))
-        print("    bake_minutes: "+str(stretch.total_seconds/60))
+    for bake in complete_bakes:
+        print("  - minimum_temperatures: "+str(bake.temperatures))
+        print("    warmup_time_minutes: "+str(bake.warmup_seconds/60))
+        print("    bake_minutes: "+str(bake.total_seconds/60))
     print("incomplete_bakes_count: "+str(len(incomplete_bakes)))
     print("complete_bakes_count: "+str(len(complete_bakes)))
     print("")
