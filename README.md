@@ -29,7 +29,13 @@ sudo python TemperatureSanitizer
 
 
 ## Changes
+* (2017-04-09) Display remaining time while temperature is >= minimum
+* (2017-04-09) Display system time when finished
 * (2017-04-08) Renamed variables for clarity, and added a region called User Settings to distinguish those variables from the rest of the code.
+
+
+## Known Issues
+(None)
 
 ## Developer Notes
 * The settings are hard-coded, in the User Settings region of the py file.

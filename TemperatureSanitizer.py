@@ -7,7 +7,7 @@ desired_total_seconds = 120 * 60
 #endregion User Settings
 
 settings_howto_msg="#These settings are in the TemperatureSanitizer.py file in the User Settings region."
-
+import datetime
 import time
 try:
     from temperusb import TemperDevice, TemperHandler
@@ -53,6 +53,7 @@ if (len(tds)>0):
     print("")
     print("#This program will show minimum temperature every "+str(interval_seconds)+" second(s), whether that span's minimum met (>=) the desired minimum, and will tell you after the temperature has been the desired minimum of "+str(desired_degrees)+" "+desired_format+" met continuously for "+str(desired_total_seconds/60)+" minutes"+".")
     print(settings_howto_msg)
+    print("start_datetime: "+str(datetime.datetime.now()))
     print("#Please wait...")
     while (True):
         this_temp = tds[0].get_temperature(format=desired_format)
@@ -83,8 +84,11 @@ if (len(tds)>0):
                         current_bake.warmup_seconds = warmup_seconds
                         complete_bakes.append(current_bake)
                         current_bake = TSBake()
-                    
-            print("#"+met_msg+"Last "+str(current_span_temperatures_count)+" second(s) average:"+str(this_avg)+"; minimum:"+str(this_min))
+            sustained_msg = ""
+            if current_bake is not None and current_bake.total_seconds>0:
+                #sustained_msg = "  # sustained:"+str(current_bake.total_seconds/60)+"m"
+                sustained_msg = "  # remaining:"+str((desired_total_seconds-current_bake.total_seconds)/60)+"m"
+            print("#"+met_msg+"Last "+str(current_span_temperatures_count)+" second(s) average:"+str(this_avg)+"; min:"+str(this_min)+sustained_msg)
             current_span_temperatures_count = 0
             current_span_temperatures_total_temperature = 0
             if (len(complete_bakes)>0):
@@ -105,6 +109,7 @@ if (len(tds)>0):
         print("    bake_minutes: "+str(bake.total_seconds/60))
     print("incomplete_bakes_count: "+str(len(incomplete_bakes)))
     print("complete_bakes_count: "+str(len(complete_bakes)))
+    print("end_datetime: "+str(datetime.datetime.now()))
     print("")
 
 else:
