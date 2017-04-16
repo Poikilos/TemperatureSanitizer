@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #region User Settings
-desired_degrees = 118
+desired_degrees = 120
 desired_format = "fahrenheit"
 interval_seconds = 60
 desired_total_seconds = 120 * 60
