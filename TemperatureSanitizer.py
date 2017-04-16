@@ -25,22 +25,22 @@ def is_criteria_met(temperatures):
     operand = None
     if desired_collate_method in ["min","minimum"]:
         operand = min(temperatures)
-    elif desired_collate_method == ["max","maximum"]:
+    elif desired_collate_method in ["max","maximum"]:
         operand = max(temperatures)
-    elif desired_collate_method == ["avg","average"]:
+    elif desired_collate_method in ["avg","average"]:
         operand = sum(temperatures) / float(len(temperatures))
     else:
         print("# Unknown collate method was selected. Please use: \n" +
               "#   min, max, or average")
         exit(5)
     met_enable = False
-    if desired_comparison = ">=":
+    if desired_comparison == ">=":
         met_enable = (operand >= desired_degrees)
-    elif desired_comparison = ">":
+    elif desired_comparison == ">":
         met_enable = (operand > desired_degrees)
-    elif desired_comparison = "<=":
+    elif desired_comparison == "<=":
         met_enable = (operand <= desired_degrees)
-    elif desired_comparison = "<":
+    elif desired_comparison == "<":
         met_enable = (operand < desired_degrees)
     else:
         print("# Unknown comparison was selected. Please use: \n" +
@@ -93,8 +93,8 @@ if (len(tds)>0):
     print("desired_degrees: "+str(desired_degrees))
     print("desired_format: "+str(desired_format))
     print("#"+process_term+" starts after desired_degrees is reached:")
-    print("desired_"+lower(process_term)+"_seconds: "+str(desired_total_seconds))
-    print("#desired_"+lower(process_term)+"_minutes: "+str(desired_total_seconds/60))
+    print("desired_"+process_term.lower()+"_seconds: "+str(desired_total_seconds))
+    print("#desired_"+process_term.lower()+"_minutes: "+str(desired_total_seconds/60))
     print("")
     print("#This program will show minimum temperature every "+str(interval_seconds)+" second(s), whether that span's minimum met (>=) the desired minimum, and will tell you after the temperature has been the desired minimum of "+str(desired_degrees)+" "+desired_format+" met continuously for "+str(desired_total_seconds/60)+" minutes"+".")
     print(settings_howto_msg)
@@ -137,7 +137,7 @@ if (len(tds)>0):
                         incomplete_bakes.append(current_bake)
                         current_bake = TSBake()
                     else:
-                        print("#Logic error detected (this should never happen): program did not end when "+lower(process_term)+" was successful (appending "+lower(process_term)+" to complete_"+lower(process_term)+"s anyway).")
+                        print("#Logic error detected (this should never happen): program did not end when "+process_term.lower()+" was successful (appending "+process_term.lower()+" to complete_"+process_term.lower()+"s anyway).")
                         current_bake.warmup_seconds = warmup_seconds
                         complete_bakes.append(current_bake)
                         current_bake = TSBake()
@@ -154,18 +154,18 @@ if (len(tds)>0):
         time.sleep(1)
         warmup_seconds += 1
 
-    print("incomplete_"+lower(process_term)+"s:")
+    print("incomplete_"+process_term.lower()+"s:")
     for bake in incomplete_bakes:
         print("  - minimum_temperatures: "+str(bake.temperatures))
         print("    warmup_time_minutes: "+str(bake.warmup_seconds/60))
-        print("    "+lower(process_term)+"_minutes: "+str(bake.total_seconds/60))
-    print("complete_"+lower(process_term)+"s:")
+        print("    "+process_term.lower()+"_minutes: "+str(bake.total_seconds/60))
+    print("complete_"+process_term.lower()+"s:")
     for bake in complete_bakes:
         print("  - minimum_temperatures: "+str(bake.temperatures))
         print("    warmup_time_minutes: "+str(bake.warmup_seconds/60))
-        print("    "+lower(process_term)+"_minutes: "+str(bake.total_seconds/60))
-    print("incomplete_"+lower(process_term)+"s_count: "+str(len(incomplete_bakes)))
-    print("complete_"+lower(process_term)+"s_count: "+str(len(complete_bakes)))
+        print("    "+process_term.lower()+"_minutes: "+str(bake.total_seconds/60))
+    print("incomplete_"+process_term.lower()+"s_count: "+str(len(incomplete_bakes)))
+    print("complete_"+process_term.lower()+"s_count: "+str(len(complete_bakes)))
     print("end_datetime: "+str(datetime.datetime.now()))
     print("")
 
