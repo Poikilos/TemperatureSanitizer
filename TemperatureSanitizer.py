@@ -1,10 +1,10 @@
 #!/usr/bin/env python
+
 #region User Settings
 desired_degrees = 118
 desired_format = "fahrenheit"
 interval_seconds = 60
 desired_total_seconds = 120 * 60
-# desired_comparison can be ">=", ">", "<=", or "<"
 desired_comparison = ">="
 desired_collate_method = "average"
 #endregion User Settings
@@ -50,8 +50,6 @@ def is_criteria_met(temperatures):
         result = operand
     return result
     
-
-#endregion WIP settings
 
 settings_howto_msg="#These settings are in the TemperatureSanitizer.py file in the User Settings region."
 import datetime

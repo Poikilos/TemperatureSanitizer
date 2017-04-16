@@ -16,6 +16,14 @@ desired_format = "fahrenheit"
 interval_seconds = 60
 desired_total_seconds = 120 * 60
 ```
+    * and, if you want to chill instead of bake, you can edit the following settings also in the py file:
+    ```python
+    desired_comparison = ">="
+    desired_collate_method = "average"
+    ```
+    * desired_comparison can be ">=", ">", "<=", or "<"
+    * desired_collate_method can be minimum (or min), maximum (or max), or average (or avg) -- for example, for a chill (using < or <=), min or average would be appropriate comparisons to ensure that a temperature reading never was above the desired temperature; but for baking (using >= or >), min or average would be recommended, where min would ensure a temperature reading didn't dip below desired temperature.
+
 * How the settings are used by the program:
     * desired_format can be "fahrenheit" or "celcius".
     * The interval may need to be at least a few seconds for accuracy, though an interval of 1 can be used if you don't mind having all that data, and your sensor is accurate enough for that type of use (trusting a single reading as part of your raw data).
