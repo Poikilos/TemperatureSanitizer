@@ -1,10 +1,57 @@
 #!/usr/bin/env python
 #region User Settings
-desired_degrees = 120
+desired_degrees = 118
 desired_format = "fahrenheit"
 interval_seconds = 60
 desired_total_seconds = 120 * 60
+# desired_comparison can be ">=", ">", "<=", or "<"
+desired_comparison = ">="
+desired_collate_method = "average"
 #endregion User Settings
+
+process_term = "Bake"
+if desired_comparison in ["<=","<"]:
+    process_term = "Chill"
+    if desired_collate_method in ["max","maximum"]:
+        print("# WARNING: using min or average is recommended for chill, \n" +
+              "#   but "+desired_collate_method+" was selected")
+
+
+def is_criteria_met(temperatures):
+    global desired_degrees
+    global desired_comparison
+    global desired_collate_method
+    result = None
+    operand = None
+    if desired_collate_method in ["min","minimum"]:
+        operand = min(temperatures)
+    elif desired_collate_method == ["max","maximum"]:
+        operand = max(temperatures)
+    elif desired_collate_method == ["avg","average"]:
+        operand = sum(temperatures) / float(len(temperatures))
+    else:
+        print("# Unknown collate method was selected. Please use: \n" +
+              "#   min, max, or average")
+        exit(5)
+    met_enable = False
+    if desired_comparison = ">=":
+        met_enable = (operand >= desired_degrees)
+    elif desired_comparison = ">":
+        met_enable = (operand > desired_degrees)
+    elif desired_comparison = "<=":
+        met_enable = (operand <= desired_degrees)
+    elif desired_comparison = "<":
+        met_enable = (operand < desired_degrees)
+    else:
+        print("# Unknown comparison was selected. Please use: \n" +
+              "#   <, <=, >, or >=")
+        exit(6)
+    if met_enable:
+        result = operand
+    return result
+    
+
+#endregion WIP settings
 
 settings_howto_msg="#These settings are in the TemperatureSanitizer.py file in the User Settings region."
 import datetime
@@ -47,15 +94,15 @@ if (len(tds)>0):
     print("interval_seconds: "+str(interval_seconds))
     print("desired_degrees: "+str(desired_degrees))
     print("desired_format: "+str(desired_format))
-    print("#Bake starts after desired_degrees is reached:")
-    print("desired_bake_seconds: "+str(desired_total_seconds))
-    print("#desired_bake_minutes: "+str(desired_total_seconds/60))
+    print("#"+process_term+" starts after desired_degrees is reached:")
+    print("desired_"+lower(process_term)+"_seconds: "+str(desired_total_seconds))
+    print("#desired_"+lower(process_term)+"_minutes: "+str(desired_total_seconds/60))
     print("")
     print("#This program will show minimum temperature every "+str(interval_seconds)+" second(s), whether that span's minimum met (>=) the desired minimum, and will tell you after the temperature has been the desired minimum of "+str(desired_degrees)+" "+desired_format+" met continuously for "+str(desired_total_seconds/60)+" minutes"+".")
     print(settings_howto_msg)
     print("start_datetime: "+str(datetime.datetime.now()))
     try:
-        print("#nominal_test_temperature: "+str(tds[0].get_temperature(format=desired_format)))
+        print("#nominal_device_reading: "+str(tds[0].get_temperature(format=desired_format)))
     except:
         print("#Could not finish reading temperature from the device.")
         exit(3)
@@ -73,10 +120,12 @@ if (len(tds)>0):
         if current_span_temperatures_count >= interval_seconds:
             this_avg = current_span_temperatures_total_temperature / current_span_temperatures_count
             this_min = min(current_temperatures)
+            good_value = is_criteria_met(current_temperatures)
             del current_temperatures[:]
             met_msg = "(< "+str(desired_degrees)+") "
-            if (this_min >= desired_degrees):
-                current_bake.temperatures.append(this_min)
+            #if (this_min >= desired_degrees):
+            if good_value is not None:
+                current_bake.temperatures.append(good_value)
                 current_bake.total_seconds += current_span_temperatures_count
                 met_msg = "(>= "+str(desired_degrees)+") "
                 if (current_bake.total_seconds>=desired_total_seconds):
@@ -90,7 +139,7 @@ if (len(tds)>0):
                         incomplete_bakes.append(current_bake)
                         current_bake = TSBake()
                     else:
-                        print("#Logic error detected (this should never happen): program did not end when bake was successful (appending bake to complete_bakes anyway).")
+                        print("#Logic error detected (this should never happen): program did not end when "+lower(process_term)+" was successful (appending "+lower(process_term)+" to complete_"+lower(process_term)+"s anyway).")
                         current_bake.warmup_seconds = warmup_seconds
                         complete_bakes.append(current_bake)
                         current_bake = TSBake()
@@ -102,23 +151,23 @@ if (len(tds)>0):
             current_span_temperatures_count = 0
             current_span_temperatures_total_temperature = 0
             if (len(complete_bakes)>0):
-                print("#Baking is finished: ")
+                print("#"+process_term+" is finished: ")
                 break
         time.sleep(1)
         warmup_seconds += 1
 
-    print("incomplete_bakes:")
+    print("incomplete_"+lower(process_term)+"s:")
     for bake in incomplete_bakes:
         print("  - minimum_temperatures: "+str(bake.temperatures))
         print("    warmup_time_minutes: "+str(bake.warmup_seconds/60))
-        print("    bake_minutes: "+str(bake.total_seconds/60))
-    print("complete_bakes:")
+        print("    "+lower(process_term)+"_minutes: "+str(bake.total_seconds/60))
+    print("complete_"+lower(process_term)+"s:")
     for bake in complete_bakes:
         print("  - minimum_temperatures: "+str(bake.temperatures))
         print("    warmup_time_minutes: "+str(bake.warmup_seconds/60))
-        print("    bake_minutes: "+str(bake.total_seconds/60))
-    print("incomplete_bakes_count: "+str(len(incomplete_bakes)))
-    print("complete_bakes_count: "+str(len(complete_bakes)))
+        print("    "+lower(process_term)+"_minutes: "+str(bake.total_seconds/60))
+    print("incomplete_"+lower(process_term)+"s_count: "+str(len(incomplete_bakes)))
+    print("complete_"+lower(process_term)+"s_count: "+str(len(complete_bakes)))
     print("end_datetime: "+str(datetime.datetime.now()))
     print("")
 
