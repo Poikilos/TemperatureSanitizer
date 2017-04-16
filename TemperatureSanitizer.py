@@ -9,6 +9,12 @@ desired_comparison = ">="
 desired_collate_method = "average"
 #endregion User Settings
 
+opposite_operator = dict()
+opposite_operator["<"] = ">="
+opposite_operator["<="] = ">"
+opposite_operator[">"] = "<="
+opposite_operator[">="] = "<"
+
 process_term = "Bake"
 if desired_comparison in ["<=","<"]:
     process_term = "Chill"
@@ -120,12 +126,12 @@ if (len(tds)>0):
             this_min = min(current_temperatures)
             good_value = is_criteria_met(current_temperatures)
             del current_temperatures[:]
-            met_msg = "(< "+str(desired_degrees)+") "
+            met_msg = "("+opposite_operator(desired_comparison)+" "+str(desired_degrees)+") "
             #if (this_min >= desired_degrees):
             if good_value is not None:
                 current_bake.temperatures.append(good_value)
                 current_bake.total_seconds += current_span_temperatures_count
-                met_msg = "(>= "+str(desired_degrees)+") "
+                met_msg = "("+desired_comparison+" "+str(desired_degrees)+") "
                 if (current_bake.total_seconds>=desired_total_seconds):
                     current_bake.warmup_seconds = warmup_seconds
                     complete_bakes.append(current_bake)
