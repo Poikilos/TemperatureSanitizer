@@ -54,9 +54,19 @@ if (len(tds)>0):
     print("#This program will show minimum temperature every "+str(interval_seconds)+" second(s), whether that span's minimum met (>=) the desired minimum, and will tell you after the temperature has been the desired minimum of "+str(desired_degrees)+" "+desired_format+" met continuously for "+str(desired_total_seconds/60)+" minutes"+".")
     print(settings_howto_msg)
     print("start_datetime: "+str(datetime.datetime.now()))
+    try:
+        print("#nominal_test_temperature: "+str(tds[0].get_temperature(format=desired_format)))
+    except:
+        print("#Could not finish reading temperature from the device.")
+        exit(3)
     print("#Please wait...")
     while (True):
-        this_temp = tds[0].get_temperature(format=desired_format)
+        try:
+            this_temp = tds[0].get_temperature(format=desired_format)
+        except:
+            print("#Could not finish reading temperature from the device." +
+                  "#  The device seems to be disconnected.")
+            exit(4)
         current_span_temperatures_count += 1
         current_span_temperatures_total_temperature += this_temp
         current_temperatures.append(this_temp)
