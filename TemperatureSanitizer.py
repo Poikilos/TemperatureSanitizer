@@ -126,7 +126,7 @@ if (len(tds)>0):
             this_min = min(current_temperatures)
             good_value = is_criteria_met(current_temperatures)
             del current_temperatures[:]
-            met_msg = "("+opposite_operator(desired_comparison)+" "+str(desired_degrees)+") "
+            met_msg = "("+opposite_operator[desired_comparison]+" "+str(desired_degrees)+") "
             #if (this_min >= desired_degrees):
             if good_value is not None:
                 current_bake.temperatures.append(good_value)
