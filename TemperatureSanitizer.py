@@ -117,6 +117,7 @@ if (len(tds)>0):
         except:
             print("#Could not finish reading temperature from the device." +
                   "#  The device seems to be disconnected.")
+            print("exit_datetime: "+str(datetime.datetime.now()))
             exit(4)
         current_span_temperatures_count += 1
         current_span_temperatures_total_temperature += this_temp
@@ -145,6 +146,7 @@ if (len(tds)>0):
                     else:
                         print("#Logic error detected (this should never happen): program did not end when "+process_term.lower()+" was successful (appending "+process_term.lower()+" to complete_"+process_term.lower()+"s anyway).")
                         current_bake.warmup_seconds = warmup_seconds
+                        print("#current_warmup_time_minutes: "+str(current_bake.warmup_seconds/60))
                         complete_bakes.append(current_bake)
                         current_bake = TSBake()
             sustained_msg = ""
