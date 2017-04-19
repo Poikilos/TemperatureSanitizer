@@ -118,6 +118,8 @@ if (len(tds)>0):
             print("#Could not finish reading temperature from the device." +
                   "#  The device seems to be disconnected.")
             print("exit_datetime: "+str(datetime.datetime.now()))
+            print("exit_bake_seconds: "+str(current_bake.total_seconds))
+            print("#exit_bake_minutes: "+str(current_bake.total_seconds/60))
             exit(4)
         current_span_temperatures_count += 1
         current_span_temperatures_total_temperature += this_temp
