@@ -148,7 +148,7 @@ if (len(tds)>0):
                     else:
                         print("#Logic error detected (this should never happen): program did not end when "+process_term.lower()+" was successful (appending "+process_term.lower()+" to complete_"+process_term.lower()+"s anyway).")
                         current_bake.warmup_seconds = warmup_seconds
-                        print("#current_pre"+process_term+"_minutes: "+str(current_bake.warmup_seconds/60))
+                        print("#current_pre"+process_term.lower()+"_minutes: "+str(current_bake.warmup_seconds/60))
                         complete_bakes.append(current_bake)
                         current_bake = TSBake()
             sustained_msg = ""
@@ -156,7 +156,7 @@ if (len(tds)>0):
                 #sustained_msg = "  # sustained:"+str(current_bake.total_seconds/60)+"m"
                 sustained_msg = "  # remaining:"+str((desired_total_seconds-current_bake.total_seconds)/60)+"m"
             else:
-                sustained_msg = "  # pre"+process_term+"_mins:"+str(warmup_seconds/60)
+                sustained_msg = "  # pre"+process_term.lower()+"_mins:"+str(warmup_seconds/60)
             print("#"+met_msg+"Last "+str(current_span_temperatures_count)+" second(s) avg:"+str(this_avg)+"; min:"+str(this_min)+sustained_msg)
             current_span_temperatures_count = 0
             current_span_temperatures_total_temperature = 0
@@ -169,12 +169,12 @@ if (len(tds)>0):
     print("incomplete_"+process_term.lower()+"s:")
     for bake in incomplete_bakes:
         print("  - minimum_temperatures: "+str(bake.temperatures))
-        print("    pre"+process_term+"_minutes: "+str(bake.warmup_seconds/60))
+        print("    pre"+process_term.lower()+"_minutes: "+str(bake.warmup_seconds/60))
         print("    "+process_term.lower()+"_minutes: "+str(bake.total_seconds/60))
     print("complete_"+process_term.lower()+"s:")
     for bake in complete_bakes:
         print("  - minimum_temperatures: "+str(bake.temperatures))
-        print("    pre"+process_term+"_time_minutes: "+str(bake.warmup_seconds/60))
+        print("    pre"+process_term.lower()+"_time_minutes: "+str(bake.warmup_seconds/60))
         print("    "+process_term.lower()+"_minutes: "+str(bake.total_seconds/60))
     print("incomplete_"+process_term.lower()+"s_count: "+str(len(incomplete_bakes)))
     print("complete_"+process_term.lower()+"s_count: "+str(len(complete_bakes)))
