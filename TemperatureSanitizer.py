@@ -9,6 +9,11 @@ desired_comparison = ">="
 desired_collate_method = "average"
 #endregion User Settings
 
+try:
+    input=raw_input
+except NameError:
+    pass
+
 opposite_operator = dict()
 opposite_operator["<"] = ">="
 opposite_operator["<="] = ">"
@@ -183,3 +188,4 @@ if (len(tds)>0):
 
 else:
     print("No TEMPer device found.")
+input("Press enter to exit")
