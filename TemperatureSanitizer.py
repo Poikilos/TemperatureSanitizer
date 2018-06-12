@@ -60,7 +60,7 @@ def is_criteria_met(temperatures):
     if met_enable:
         result = operand
     return result
-    
+
 
 settings_howto_msg="#These settings are in the TemperatureSanitizer.py file in the User Settings region."
 import datetime
@@ -188,4 +188,8 @@ if (len(tds)>0):
 
 else:
     print("No TEMPer device found.")
+    print("You must use a device supported by temperusb,")
+    print("otherwise you must wait until this program supports")
+    print("https://github.com/edorfaus/TEMPered")
+    print("(https://github.com/mreymann/temperx supports TEMPered)")
 input("Press enter to exit")

@@ -3,9 +3,12 @@ TemperatureSanitizer detects when a minimum temperature is sustained for a minim
 
 In addition to the GPL 3.0 license, the following disclaimer applies: THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-## Requirements:
+## Requirements
 * A TEMPerV1 compatible USB thermometer (can be ordered online)
 * temperusb library for python (if your python does not have temperusb is not installed yet, the program will detect that problem and instruct you how to correct that). Installing temperusb requires the temperusb whl file or an internet connection in order to follow those instructions displayed by this program.
+
+## Known Issues
+* Does not support TEMPer with USB ID 413d:2107 (try lsusb to see your ID while device is plugged in). This project should use https://github.com/edorfaus/TEMPered instead of temperusb (which has not responded to this issue on GitHub)
 
 ## Usage
 * Make sure you place the temperature sensor in a "cold spot," such as (if you are using this program to monitor a bedbug oven) inside a book in the middle of your load.
