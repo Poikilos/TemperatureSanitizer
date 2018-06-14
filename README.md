@@ -7,6 +7,31 @@ In addition to the GPL 3.0 license, the following disclaimer applies: THE SOFTWA
 * A TEMPerV1 compatible USB thermometer (can be ordered online)
 * temperusb library for python (if your python does not have temperusb is not installed yet, the program will detect that problem and instruct you how to correct that). Installing temperusb requires the temperusb whl file or an internet connection in order to follow those instructions displayed by this program.
 
+## Planned Features
+* support TEMPered
+  * Where `/dev/hidraw4` is the correct device (could be any number), run `hid-query /dev/hidraw4 0x01 0x80 0x33 0x01 0x00 0x00 0x00 0x00`
+
+  * an example of parsing the output is at <https://github.com/padelt/temper-python/issues/84#issuecomment-393930865>
+  (possibly auto-install TEMPered such as with script below)
+```bash
+if [ ! `which hid-query` ]; then
+  cd $HOME
+  if [ ! -d Downloads ]; then mkdir Downloads; fi
+  cd Downloads
+  if [ ! -d TEMPered ]; then
+    git clone https://github.com/edorfaus/TEMPered.git
+    cd TEMPered
+  else
+    cd TEMPered
+    git pull
+  fi
+  if [ ! -d build ]; then mkdir build; fi
+  cd build
+  cmake ..
+  sudo make install
+fi
+```
+
 ## Known Issues
 * Does not support TEMPer with USB ID 413d:2107 (try lsusb to see your ID while device is plugged in). This project should use https://github.com/edorfaus/TEMPered instead of temperusb (which has not responded to this issue on GitHub)
 
