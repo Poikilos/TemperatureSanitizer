@@ -9,7 +9,12 @@ In addition to the GPL 3.0 license, the following disclaimer applies: THE SOFTWA
 
 ## Planned Features
 * support TEMPered
-  * Where `/dev/hidraw4` is the correct device (could be any number), run `hid-query /dev/hidraw4 0x01 0x80 0x33 0x01 0x00 0x00 0x00 0x00`
+  * Where `/dev/hidraw4` is the correct device (could be any number--usually last one listed via `ls /dev | grep hidraw`),
+    run `sudo hid-query /dev/hidraw1 0x01 0x80 0x33 0x01 0x00 0x00 0x00 0x00`
+    the response is 8 bytes such as:
+    `80 80 0a fc  4e 20 00 00`
+    where 0a fc is an integer (2825 in this case). Divide that by 100
+    to get temperature.
 
   * an example of parsing the output is at <https://github.com/padelt/temper-python/issues/84#issuecomment-393930865>
   (possibly auto-install TEMPered such as with script below)
@@ -29,7 +34,39 @@ if [ ! `which hid-query` ]; then
   cd build
   cmake ..
   sudo make install
+  if [ ! -d /usr/local/lib ]; then mkdir -p /usr/local/lib; fi
+  sudo cp libtempered/libtempered.so.0 /usr/local/lib/
+  sudo cp libtempered-util/libtempered-util.so.0 /usr/local/lib/
+  sudo ln -s /usr/local/lib/libtempered.so.0 /usr/local/lib/libtempered.so
+  sudo ln -s /usr/local/lib/libtempered-util.so.0 /usr/local/lib/libtempered-util.so
 fi
+```
+  * find hid like:
+```bash
+  #LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib tempered
+  # previous line doesn't work for some reason so:
+  hid-query --enum
+  # lists 2 for some reason:
+  # /dev/hidraw0 : 413d:2107 interface 0 : (null) (null)
+  # /dev/hidraw1 : 413d:2107 interface 1 : (null) (null)
+```
+  * make script named readTEMPer-driverless-withdate.sh (by jbeale1 from link above) like:
+```bash
+#!/bin/bash
+OUTLINE=`sudo ./hid-query /dev/hidraw3 0x01 0x80 0x33 0x01 0x00 0x00 0x00 0x00|grep -A1 ^Response|tail -1`
+OUTNUM=`echo $OUTLINE|sed -e 's/^[^0-9a-f]*[0-9a-f][0-9a-f] [0-9a-f][0-9a-f] \([0-9a-f][0-9a-f]\) \([0-9a-f][0-9a-f]\) .*$/0x\1\2/'`
+HEX4=${OUTNUM:2:4}
+DVAL=$(( 16#$HEX4 ))
+bc <<< "scale=2; $DVAL/100"
+```
+
+  * use script above like
+```bash
+while [ true ]; do
+  temp=`./readTEMPer-driverless-withdate.sh`
+  echo $(date +"%F %T") " , " $temp
+  sleep 14
+done
 ```
 
 ## Known Issues
