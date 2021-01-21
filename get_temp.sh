@@ -4,6 +4,11 @@ if [ ! -d ~/venv ]; then
 fi
 THIS_VENV=~/venv/temper
 
+EXTRA_BAD_TEMP_ARGS=
+if [ "@$1" = "@--silent-if-ok" ]; then
+    EXTRA_BAD_TEMP_ARGS="--silent-if-ok"
+fi
+
 if [ ! -f "`command -v virtualenv`" ]; then
     INSTALL_CMD=dnf install -y
     $INSTALL_CMD python3-virtualenv
@@ -52,7 +57,7 @@ if [ $TEMPER_CODE -ne 0 ]; then
     python -c "import temper"
     TEMPER_CODE=$?
 fi
-python bad_temper.py
+python bad_temper.py $EXTRA_BAD_TEMP_ARGS
 if [ $? -eq 2 ]; then
     # python -m pip install --upgrade pip
     # python -m pip install --upgrade setuptools wheel

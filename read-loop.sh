@@ -1,7 +1,7 @@
 #!/bin/bash
 CMD=./readTEMPer-driverless-withdate.sh
 if [ ! -f "`command -v hid-query`" ]; then
-    CMD=./get_temp.sh
+    CMD="./get_temp.sh --silent-if-ok"
 fi
 
 while [ true ]; do
