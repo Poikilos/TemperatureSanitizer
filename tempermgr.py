@@ -58,6 +58,10 @@ def c_to_f(c):
     return (c * 1.8) + 32
 
 
+import getpass
+user = getpass.getuser()
+tryGroup = 'driverdev'
+
 def permission_help():
     print("You must run with sudo, root, or add a udev rule via:")
     print("sudo groupadd {}".format(tryGroup))
@@ -66,6 +70,7 @@ def permission_help():
           '99-hidraw-permissions.rules'.format(tryGroup))
     print('sudo usermod -a -G {} {}'.format(tryGroup, user))
     print('sudo udevadm control --reload-rules')
+    print('Then log out and back in if you\'re {}'.format(user))
 
 
 class TSBake:

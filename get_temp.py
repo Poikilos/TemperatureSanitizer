@@ -20,9 +20,6 @@ what the main function of that file does.
 '''
 
 import sys
-import getpass
-user = getpass.getuser()
-tryGroup = 'driverdev'
 
 
 from temper import Temper
