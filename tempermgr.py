@@ -10,30 +10,34 @@ except NameError:
 
 
 install_msg = '''
-You do not have temperusb installed.
+You do not have ccwienk/temper installed (not to be confused with the HTML templating engine named temper on pypi).
 Please run the following commands in command line.
 - If you are in Windows first run:
   cd C:\Python*
   or whatever is your Python directory.
 - If you are using a Linux-like environment first run:
   sudo su -
+  # you don't really need to sudo nor run as root (the program will show a message on how to add a udev rule if there is a PermissionError)
+  # you don't really need to use --user if you use a virtualenv, the preferred install method
+  # If are using a virtualenv such as creating using the
+  # get_temp.sh script, there is no need to run any of these
+  # install commands. Instead, run this script using
+  #   ~/venv/temper/bin/python
+  # OR activate the virtualenv before running via:
+  #   source ~/venv/temper/bin/activate
+
 python -m pip install --user --upgrade pip
 python -m pip install --user --upgrade pip wheel
-python -m pip install --user temperusb
-(unless you are using a virtualenv such as creating using the
-get_temp.sh script. In that case, there is no need to run these
-commands. Instead, run this script using ~/venv/temper/bin/python or
-activate the virtualenv before running via:
-source ~/venv/temper/bin/activate
+python -m pip install --user --upgrade https://github.com/ccwienk/temper/archive/master.zip
 '''
 try_temperusb = False
-enable_temperusb = False
+_enable_temperusb = False
 if try_temperusb:
     try:
         from temperusb import TemperDevice, TemperHandler
     except ImportError:
         print(install_msg)
-        enable_temperusb = False
+        _enable_temperusb = False
 
 
 from temper import Temper
@@ -105,7 +109,7 @@ class TemperDeviceMgr:
         if tempermgr is None:
             raise RuntimeError("The TemperDeviceMgr class requires a"
                                " TemperMgr but the argument was None.")
-        if enable_temperusb:
+        if _enable_temperusb:
             self.th = None
             try:
                 self.th = TemperHandler()
@@ -130,7 +134,7 @@ class TemperDeviceMgr:
         PermissionError (see the permission_help function)
         ValueError (bad settings['scale'])
         '''
-        if enable_temperusb:
+        if _enable_temperusb:
             return self.tds[deviceIndex].get_temperature(
                 format=self.tempermgr.get('scale')
             )

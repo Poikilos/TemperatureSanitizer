@@ -1,16 +1,18 @@
 # TemperatureSanitizer
-TemperatureSanitizer detects when a minimum temperature is sustained for a minimum time. This program uses temperusb (a.k.a. temper) or ccwienk's temper for a wider range of devices, and default settings are for killing bedbugs:
+TemperatureSanitizer detects when a minimum temperature is sustained for a minimum time. The default settings are for killing bedbugs:
 - 120 minutes (though 90 minutes is considered minimum)
 - 120 degrees fahrenheit (though 118 is considered minimum).
 
-Bedbug ovens are available from [ZappBug on Amazon](https://www.amazon.com/s?k=ZappBug).
+The settings of this software also allow for a "chill" rather than a "bake", so it is suitable for various purposes. A real timespan rather than a delay is necessary for a level of accuracy necessary for science (this could be accomplished by modifying TemperatureSanitizer.py). Using a delay rather than a calculated timespan between reads errs on the side of overkill (only by milliseconds, if that, though), so the delay is reliable for scenarios where fractions of a second more than the allotted time are acceptable. Also, the counting doesn't start until the temperature is reached, so the bake may approach an extra minute long if the previous interval of 60 seconds (or whatever amount you set for settings['interval']) had reached the temperature at some point but not enough to meet the stat requirement (settings['useStat'] can be the min, max, or avg of the interval).
+
+Bedbug ovens are available from ThermalStrike (I use ThermalStrike Ranger for a low-cost option) or [ZappBug on Amazon](https://www.amazon.com/s?k=ZappBug).
 
 For sustaining a minimum temperature, try to place the temperature sensor in the coolest spot (such as the innermost part of the most insulated part of the load).
 
-If the temperusb script is not compatible with your device, you can use read-loop.py instead if you install temper (not the pypi temper package which is something else--run bad_temper.py to see if that is present!). Alternatively, use get_temp.sh to install dependencies and display the temperature or use read-loop.sh on a GNU+Linux system to install dependencies in a virtual environment and run the loop.
+Beware of bedbug myths. They don't "die instantly" in the dryer. People often rid themselves of fleas and think they killed bedbugs easily, but bedbugs don't die easily. See the related NIH study under "Reference Temperatures" for a reliable approach.
 
 
-## Reference temperatures
+## Reference Temperatures
 According to [Temperature and Time Requirements for Controlling Bed Bugs (Cimex lectularius) under Commercial Heat Treatment Conditions ](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4553552/) by Stephen A. Kells* and Michael J. Goblirsch, bedbug eggs can survive 71.5 min at 48 °C. Therefore, go longer or higher than that to be sure. Note that your temperature sensor may not be in the coolest spot (attempt to place it in a cool spot). The lethal temperature "for eggs was 54.8 °C" in the study, while the sub-lethal temperatures took longer. Reaching the acute temperature may be impossible in some cases of a large bug oven or house heat treatment, and the acute temperature is more likely to damage your property or bedbug oven. Therefore, the lower temperature and longer times are the defaults for this program, as listed at the beginning of this document.
 
 Conversions table for reference temperatures:
@@ -23,9 +25,8 @@ Conversions table for reference temperatures:
 ## Requirements
 The scripts will detect missing dependencies and instruct you how to correct that
 - A TEMPer compatible USB thermometer (can be ordered online)
-  - TEMPerV1 for temperusb
-- [github.com/ccwienk/temper](https://github.com/ccwienk/temper) or another fork of urwen/temper (NOT the pypi package which is not for temperature sensors) or temperusb
-- The temperusb library for Python. Installing temperusb requires the temperusb whl file or an internet connection in order to follow those instructions displayed by this program.
+- [github.com/ccwienk/temper](https://github.com/ccwienk/temper) or another fork of urwen/temper (NOT the pypi package which is also named temper but is an HTML templating engine)
+  - get_temp.sh installs it into a virtualenv automatically (run.sh calls it as well, so you can use run.sh as a more reliable way of calling TemperatureSanitizer.py)
 
 
 ## Usage
@@ -71,6 +72,9 @@ what appears, as it may not have any name by the id string).
 ## Developer Notes
 * The settings are hard-coded, in the User Settings region of the py file.
 * When a span is complete, the span is added to the bake only if the minimum temperature of the span meets the desired temperature.
+
+### Deprecated
+- temperusb: The temperusb library (see `try_temperusb` in tempermgr.py) only supports TEMPerV1. Installing temperusb requires the temperusb whl file or an internet connection in order to follow those instructions displayed by this program.
 
 ### Discarded plans
 #### TEMPered
