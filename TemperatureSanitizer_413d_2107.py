@@ -18,12 +18,25 @@ instead of calling temper.py which would run main, it does something
 similar to what the main function of that file does.
 '''
 
+import getpass
+user = getpass.getuser()
+tryGroup = 'driverdev'
+
 
 from temper import Temper
 tmpr = Temper()
-result = tmpr.read()
-if len(result) < 1:
-    print("temper didn't find any devices.")
-    exit(1)
-# print("result[0]['internal temperature']: {}".format(result[0]['internal temperature']))
-print(result[0]['internal temperature'])
+try:
+    result = tmpr.read()
+    if len(result) < 1:
+        print("temper didn't find any devices.")
+        exit(1)
+    # print("result[0]['internal temperature']: {}"
+    # "".format(result[0]['internal temperature']))
+    print("{} C".format(result[0]['internal temperature']))
+except PermissionError as ex:
+    print("You must run as root or add a udev rule such as via:")
+    print('echo \'KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0664",'
+          ' GROUP="{}"\' | sudo tee /etc/udev/rules.d/'
+          '99-hidraw-permissions.rules'.format(tryGroup))
+    print('sudo usermod -a -G {} {}'.format(tryGroup, user))
+    exit(3)

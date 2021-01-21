@@ -11,7 +11,7 @@ fi
 
 if [ -d "$THIS_VENV" ]; then
     source $THIS_VENV/bin/activate
-    python3 -c "import temperusb"
+    python -c "import temperusb"
     if [ $? -ne 0 ]; then
         cat << END
 The dependencies are broken in $THIS_VENV (probably from upgrading to a
@@ -22,10 +22,18 @@ END
 fi
 
 if [ ! -d "$THIS_VENV" ]; then
-    python3 -m virtualenv "$THIS_VENV"
+    python -m virtualenv "$THIS_VENV"
+fi
+ACTIVATOR=$THIS_VENV/bin/activate
+source $ACTIVATOR
+if [ $? -ne 0 ]; then
+    echo
+    echo "Error:"
+    echo "Activating the virtual environment using $ACTIVATOR failed."
+    echo
+    exit 4
 fi
 
-source $THIS_VENV/bin/activate
 python -c "import temperusb"
 if [ $? -ne 0 ]; then
     echo "* installing temperusb..."
@@ -33,7 +41,7 @@ if [ $? -ne 0 ]; then
     python -m pip install --upgrade setuptools wheel
     python -m pip install --upgrade temperusb
 fi
-python3 -c "import temper"
+python -c "import temper"
 TEMPER_CODE=$?
 THIS_TEMPER=https://github.com/ccwienk/temper/archive/master.zip
 # ^ This fork of https://github.com/urwen/temper/network
@@ -41,7 +49,7 @@ THIS_TEMPER=https://github.com/ccwienk/temper/archive/master.zip
 if [ $TEMPER_CODE -ne 0 ]; then
     echo "* installing $THIS_TEMPER..."
     python -m pip install --upgrade $THIS_TEMPER
-    python3 -c "import temper"
+    python -c "import temper"
     TEMPER_CODE=$?
 fi
 python bad_temper.py
@@ -58,19 +66,24 @@ python -c "import temperusb"
 if [ $? -ne 0 ]; then
     cat << END
 The script $0 is unable to create/repair the venv: $THIS_VENV
-as the dependency still will not import.
+as python cannot import temperusb.
 END
-    exit 1
+    exit 4
 fi
+
 python -c "import temper"
 # ^ https://github.com/urwen/temper
 
 if [ $? -ne 0 ]; then
     cat << END
 The script $0 is unable to create/repair the venv: $THIS_VENV
-as the dependency still will not import.
+as python cannot import temper.
 END
-    exit 1
+    exit 4
 fi
 # python TemperatureSanitizer.py
 python TemperatureSanitizer_413d_2107.py
+TEMP_RESULT=$?
+if [ $TEMP_RESULT -ne 0 ]; then
+    exit $TEMP_RESULT
+fi

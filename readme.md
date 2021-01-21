@@ -1,77 +1,28 @@
 # TemperatureSanitizer
-TemperatureSanitizer detects when a minimum temperature is sustained for a minimum time. This program uses temperusb aka temper, and default settings are for killing bedbugs (set to 120mins though 90 is considered minimum, and 120 degrees fahrenheit though 118 is considered minimum).
+TemperatureSanitizer detects when a minimum temperature is sustained for a minimum time. This program uses temperusb aka temper, and default settings are for killing bedbugs:
+- 120 minutes (though 90 minutes is considered minimum)
+- 120 degrees fahrenheit (though 118 is considered minimum).
+
+Bedbug ovens are available from [ZappBug on Amazon](https://www.amazon.com/s?k=ZappBug).
+
+For sustaining a minimum temperature, try to place the temperature sensor in the coolest spot (such as the innermost part of the most insulated part of the load).
+
+If the temperusb script is not compatible with your device, you can use read-loop.py instead if you install temper (not the pypi temper package which is something else--run bad_temper.py to see if that is present!). Alternatively, use get_temp.sh to install dependencies and display the temperature or use read-loop.sh on a GNU+Linux system to install dependencies in a virtual environment and run the loop.
+
+
+## Reference temperatures
+According to [Temperature and Time Requirements for Controlling Bed Bugs (Cimex lectularius) under Commercial Heat Treatment Conditions ](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4553552/) by Stephen A. Kells* and Michael J. Goblirsch, bedbug eggs can survive 71.5 min at 48 °C. Therefore, go longer or higher than that to be sure. Note that your temperature sensor may not be in the coolest spot (attempt to place it in a cool spot). The lethal temperature "for eggs was 54.8 °C" in the study, while the sub-lethal temperatures took longer. Reaching the acute temperature may be impossible in some cases of a large bug oven or house heat treatment, and the acute temperature is more likely to damage your property or bedbug oven. Therefore, the lower temperature and longer times are the defaults for this program, as listed at the beginning of this document.
+
+Conversions table for reference temperatures:
+- 113° F = 45° C
+- 118.4° F = 48° C
+- 120° F = 48.8889° C
+- 130.64 F = 54.8 C
 
 
 ## Requirements
 * A TEMPerV1 compatible USB thermometer (can be ordered online)
 * temperusb library for python (if your python does not have temperusb is not installed yet, the program will detect that problem and instruct you how to correct that). Installing temperusb requires the temperusb whl file or an internet connection in order to follow those instructions displayed by this program.
-
-
-## Planned Features
-* support TEMPered
-  * Where `/dev/hidraw4` is the correct device (could be any number--usually last one listed via `ls /dev | grep hidraw`),
-    run `sudo hid-query /dev/hidraw1 0x01 0x80 0x33 0x01 0x00 0x00 0x00 0x00`
-    the response is 8 bytes such as:
-    `80 80 0a fc  4e 20 00 00`
-    where 0a fc is an integer (2825 in this case). Divide that by 100
-    to get temperature.
-
-  * an example of parsing the output is at <https://github.com/padelt/temper-python/issues/84#issuecomment-393930865>
-  (possibly auto-install TEMPered such as with script below)
-```bash
-if [ ! `which hid-query` ]; then
-  cd $HOME
-  if [ ! -d Downloads ]; then mkdir Downloads; fi
-  cd Downloads
-  if [ ! -d TEMPered ]; then
-    git clone https://github.com/edorfaus/TEMPered.git
-    cd TEMPered
-  else
-    cd TEMPered
-    git pull
-  fi
-  if [ ! -d build ]; then mkdir build; fi
-  cd build
-  cmake ..
-  sudo make install
-  if [ ! -d /usr/local/lib ]; then mkdir -p /usr/local/lib; fi
-  sudo cp libtempered/libtempered.so.0 /usr/local/lib/
-  sudo cp libtempered-util/libtempered-util.so.0 /usr/local/lib/
-  sudo ln -s /usr/local/lib/libtempered.so.0 /usr/local/lib/libtempered.so
-  sudo ln -s /usr/local/lib/libtempered-util.so.0 /usr/local/lib/libtempered-util.so
-fi
-```
-  * find hid like:
-```bash
-  #LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib tempered
-  # previous line doesn't work for some reason so:
-  hid-query --enum
-  # lists 2 for some reason:
-  # /dev/hidraw0 : 413d:2107 interface 0 : (null) (null)
-  # /dev/hidraw1 : 413d:2107 interface 1 : (null) (null)
-```
-  * make script named readTEMPer-driverless-withdate.sh (by jbeale1 from link above) like:
-```bash
-#!/bin/bash
-OUTLINE=`sudo ./hid-query /dev/hidraw3 0x01 0x80 0x33 0x01 0x00 0x00 0x00 0x00|grep -A1 ^Response|tail -1`
-OUTNUM=`echo $OUTLINE|sed -e 's/^[^0-9a-f]*[0-9a-f][0-9a-f] [0-9a-f][0-9a-f] \([0-9a-f][0-9a-f]\) \([0-9a-f][0-9a-f]\) .*$/0x\1\2/'`
-HEX4=${OUTNUM:2:4}
-DVAL=$(( 16#$HEX4 ))
-bc <<< "scale=2; $DVAL/100"
-```
-
-  * use script above like
-```bash
-while [ true ]; do
-  temp=`./readTEMPer-driverless-withdate.sh`
-  echo $(date +"%F %T") " , " $temp
-  sleep 14
-done
-```
-
-
-## Known Issues
-* Does not support TEMPer with USB ID 413d:2107 (try lsusb to see your ID while device is plugged in). This project should use https://github.com/edorfaus/TEMPered instead of temperusb (which has not responded to this issue on GitHub)
 
 
 ## Usage
@@ -107,9 +58,78 @@ sudo python TemperatureSanitizer
 
 
 ## Known Issues
-See <https://github.com/poikilos/TemperatureSanitizer/issues>.
+See [github.com/poikilos/TemperatureSanitizer/issues](https://github.com/poikilos/TemperatureSanitizer/issues).
 
+When reporting issues, provide the USB id of your device, such as via
+`lsusb` on Linux (run it before and after inserting the device to see
+what appears, as it may not have any name by the id string).
 
 ## Developer Notes
 * The settings are hard-coded, in the User Settings region of the py file.
 * When a span is complete, the span is added to the bake only if the minimum temperature of the span meets the desired temperature.
+
+### Discarded plans
+#### TEMPered
+
+#### Include or compile hid-query
+Where `/dev/hidraw4` is the correct device (could be any number--usually last one listed via `ls /dev | grep hidraw`),
+run `sudo hid-query /dev/hidraw1 0x01 0x80 0x33 0x01 0x00 0x00 0x00 0x00`
+the response is 8 bytes such as:
+`80 80 0a fc  4e 20 00 00`
+where 0a fc is an integer (2825 in this case). Divide that by 100 to get the temperature.
+
+An example of parsing the output is at
+<https://github.com/padelt/temper-python/issues/84#issuecomment-393930865>
+(possibly auto-install TEMPered such as with script below)
+```bash
+if [ ! `which hid-query` ]; then
+  cd $HOME
+  if [ ! -d Downloads ]; then mkdir Downloads; fi
+  cd Downloads
+  if [ ! -d TEMPered ]; then
+    git clone https://github.com/edorfaus/TEMPered.git
+    cd TEMPered
+  else
+    cd TEMPered
+    git pull
+  fi
+  if [ ! -d build ]; then mkdir build; fi
+  cd build
+  cmake ..
+  sudo make install
+  if [ ! -d /usr/local/lib ]; then mkdir -p /usr/local/lib; fi
+  sudo cp libtempered/libtempered.so.0 /usr/local/lib/
+  sudo cp libtempered-util/libtempered-util.so.0 /usr/local/lib/
+  sudo ln -s /usr/local/lib/libtempered.so.0 /usr/local/lib/libtempered.so
+  sudo ln -s /usr/local/lib/libtempered-util.so.0 /usr/local/lib/libtempered-util.so
+fi
+```
+
+Find hid like:
+```bash
+  #LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib tempered
+  # previous line doesn't work for some reason so:
+  hid-query --enum
+  # lists 2 for some reason:
+  # /dev/hidraw0 : 413d:2107 interface 0 : (null) (null)
+  # /dev/hidraw1 : 413d:2107 interface 1 : (null) (null)
+```
+
+A script such as readTEMPer-driverless-withdate.sh (by jbeale1 from link above) could be made like:
+```bash
+#!/bin/bash
+OUTLINE=`sudo ./hid-query /dev/hidraw3 0x01 0x80 0x33 0x01 0x00 0x00 0x00 0x00|grep -A1 ^Response|tail -1`
+OUTNUM=`echo $OUTLINE|sed -e 's/^[^0-9a-f]*[0-9a-f][0-9a-f] [0-9a-f][0-9a-f] \([0-9a-f][0-9a-f]\) \([0-9a-f][0-9a-f]\) .*$/0x\1\2/'`
+HEX4=${OUTNUM:2:4}
+DVAL=$(( 16#$HEX4 ))
+bc <<< "scale=2; $DVAL/100"
+```
+
+The script above would be used like:
+```bash
+while [ true ]; do
+  temp=`./readTEMPer-driverless-withdate.sh`
+  echo $(date +"%F %T") " , " $temp
+  sleep 14
+done
+```

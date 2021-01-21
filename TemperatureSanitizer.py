@@ -65,16 +65,27 @@ def is_criteria_met(temperatures):
 settings_howto_msg="#These settings are in the TemperatureSanitizer.py file in the User Settings region."
 import datetime
 import time
+install_msg = '''
+You do not have temperusb installed.
+Please run the following commands in command line.
+- If you are in Windows first run:
+  cd C:\Python*
+  or whatever is your Python directory.
+- If you are using a Linux-like environment first run:
+  sudo su -
+python -m pip install --user --upgrade pip
+python -m pip install --user --upgrade pip wheel
+python -m pip install --user temperusb
+(unless you are using a virtualenv such as creating using the
+get_temp.sh script. In that case, there is no need to run these
+commands. Instead, run this script using ~/venv/temper/bin/python or
+activate the virtualenv before running via:
+source ~/venv/temper/bin/activate
+'''
 try:
     from temperusb import TemperDevice, TemperHandler
 except:
-    print("You do not have temperusb installed.\n"
-          "Please run the following commands in terminal\n"
-          " (if in Windows first cd C:\Python27 [or your Python folder],\n"
-          " but if in *nix-like environment first sudo su -):\n"
-          "python -m pip install --upgrade pip\n"
-          "python -m pip install --upgrade pip wheel\n"
-          "python -m pip install temperusb\n")
+    print(install_msg)
     exit(1)
 th = None
 try:
@@ -99,7 +110,15 @@ incomplete_bakes = list()
 current_bake = TSBake()
 current_temperatures = list()
 warmup_seconds = 0
-if (len(tds)>0):
+if len(tds) < 1:
+    msg = ("No TEMPer device found."
+           "You must use a device supported by temperusb,"
+           "otherwise you must wait until this program supports"
+           "https://github.com/edorfaus/TEMPered"
+           "(https://github.com/mreymann/temperx supports TEMPered)")
+    raise RuntimeError(msg)
+
+def main():
     print("interval_seconds: "+str(interval_seconds))
     print("desired_degrees: "+str(desired_degrees))
     print("desired_format: "+str(desired_format))
@@ -186,10 +205,8 @@ if (len(tds)>0):
     print("end_datetime: "+str(datetime.datetime.now()))
     print("")
 
-else:
-    print("No TEMPer device found.")
-    print("You must use a device supported by temperusb,")
-    print("otherwise you must wait until this program supports")
-    print("https://github.com/edorfaus/TEMPered")
-    print("(https://github.com/mreymann/temperx supports TEMPered)")
-input("Press enter to exit")
+
+    input("Press enter to exit")
+
+if __name__ == "__main__":
+    main()

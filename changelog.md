@@ -8,7 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - Support more devices using ccwienk/temper, a fork of urwen/temper, but
   only in get_temp.sh (which read-loop.sh uses if hid-query isn't
-  present).
+  present)
+  - Tested with 413d:2107 (applies to [Jepeak Temper High Accurate USB Thermometer Temperature Sensor Data Logger Record for PC Laptop](https://www.amazon.com/gp/product/B009YRP906/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1) and others)
 ### Changed
 - Move changes to Changelog.
 
