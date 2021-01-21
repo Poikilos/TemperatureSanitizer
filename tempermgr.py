@@ -64,13 +64,15 @@ tryGroup = 'driverdev'
 
 def permission_help():
     print("You must run with sudo, root, or add a udev rule via:")
+    print()
     print("sudo groupadd {}".format(tryGroup))
     print('echo \'KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0664",'
           ' GROUP="{}"\' | sudo tee /etc/udev/rules.d/'
           '99-hidraw-permissions.rules'.format(tryGroup))
     print('sudo usermod -a -G {} {}'.format(tryGroup, user))
     print('sudo udevadm control --reload-rules')
-    print('Then log out and back in if you\'re {}'.format(user))
+    print()
+    print('# Then log out and back in if you\'re {}.'.format(user))
 
 
 class TSBake:
