@@ -18,8 +18,9 @@ if hasattr(t, 'doctype'):
     exit(2)
 elif hasattr(t, 'usb_devices'):
     if not silent_if_ok:
-        print("You have the correct temper.")
+        print("You have the correct temper module.")
     exit(0)
 else:
-    print("Your temper package is ambiguous. It may either be the HTML template engine or the temperature sensor driver.")
+    print("Your temper package is ambiguous. It may either be the HTML"
+          " template engine or the temperature sensor driver.")
     exit(5)

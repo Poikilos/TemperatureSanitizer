@@ -1,0 +1,6 @@
+#!/bin/sh
+if [ ! -d ~/venv ]; then
+    mkdir -p ~/venv
+fi
+THIS_VENV=~/venv/temper
+ACTIVATOR=$THIS_VENV/bin/activate

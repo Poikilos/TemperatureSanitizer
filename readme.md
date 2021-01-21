@@ -30,26 +30,27 @@ The scripts will detect missing dependencies and instruct you how to correct tha
 
 ## Usage
 * Make sure you place the temperature sensor in a "cold spot," such as (if you are using this program to monitor a bedbug oven) inside a book in the middle of your load.
-* Change the following settings by editing the py file:
+* Change the following settings by editing TemperatureSanitizer or utilizing tempermgr as a library similarly to how TemperatureSanitizer.py does. A settings dictionary passed to the TemperMgr constructor can include the following settings (the defaults are below):
   ```python
-desired_degrees = 120
-desired_format = "fahrenheit"
-interval_seconds = 60
-desired_total_seconds = 120 * 60
+settings = {}
+settings['target'] = 120
+settings['scale'] = "fahrenheit"
+settings['interval'] = 60  # the interval in seconds (get one average or other specified stat per interval)
+settings['minTime'] = 120 * 60  # the total desired time at the temperature
 ```
-  * and, if you want to chill instead of bake, you can edit the following settings also in the py file:
+  * and, if you want to chill instead of bake, you can edit the following settings:
       ```python
-    desired_comparison = ">="
-    desired_collate_method = "average"
+    settings['compareOp'] = ">="
+    settings['useStat'] = "average"
 ```
-  * desired_comparison can be ">=", ">", "<=", or "<"
-  * desired_collate_method can be minimum (or min), maximum (or max), or average (or avg) -- for example, for a chill (using < or <=), min or average would be appropriate comparisons to ensure that a temperature reading never was above the desired temperature; but for baking (using >= or >), min or average would be recommended, where min would ensure a temperature reading didn't dip below desired temperature.
+  * `settings['compareOp']` can be ">=", ">", "<=", or "<"
+  * `settings['useStat']` can be minimum (or min), maximum (or max), or average (or avg) -- for example, for a chill (using < or <=), min or average would be appropriate comparisons to ensure that a temperature reading never was above the desired temperature; but for baking (using >= or >), min or average would be recommended, where min would ensure a temperature reading didn't dip below desired temperature.
 
 * How the settings are used by the program:
-  * desired_format can be "fahrenheit" or "celcius".
+  * scale can be "fahrenheit" or "celcius".
   * The interval may need to be at least a few seconds for accuracy, though an interval of 1 can be used if you don't mind having all that data, and your sensor is accurate enough for that type of use (trusting a single reading as part of your raw data).
   * The temperature is always checked every second. This is not configurable, but only the minimum and avarage are displayed from each interval, which is a group of these secondly readings.
-  * The seconds will start counting when the minimum temperature of the interval is at least desired_degrees. If the total number of seconds of bake time is reached (when there was a consecutive set of spans where the minimum never was below desired_degrees), the program will end and show a summary (including a list of temperatures, each of which is the minimum temperature of each consecutive interval that had the desired temperature as its minimum). Otherwise, the program will continue collecting data indefinitely.
+  * The seconds will start counting when the minimum temperature of the interval is at least at the settings['target'] temperature. If the total number of seconds of bake time is reached (when there was a consecutive set of spans where the minimum never was below settings['target'] temperature), the program will end and show a summary (including a list of temperatures, each of which is the minimum temperature of each consecutive interval that had the desired temperature as its minimum). Otherwise, the program will continue collecting data indefinitely.
 * Run:
 ```bash
 # cd to the directory where you saved the py file, then:

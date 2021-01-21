@@ -1,12 +1,37 @@
 #!/bin/sh
-if [ ! -d ~/venv ]; then
-    mkdir -p ~/venv
-fi
-THIS_VENV=~/venv/temper
+source ./temper_env.rc
 
 EXTRA_BAD_TEMP_ARGS=
-if [ "@$1" = "@--silent-if-ok" ]; then
-    EXTRA_BAD_TEMP_ARGS="--silent-if-ok"
+EXTRA_GET_TEMP_ARGS=
+
+usage(){
+    cat <<END
+
+Usage:
+--silent-if-ok: doesn't show a correct device message.
+-f: display the temperature in fahrenheit
+
+END
+}
+
+ANY_ARGS=false
+
+for var in "$@"
+do
+    if [ "@$var" = "@--silent-if-ok" ]; then
+        EXTRA_BAD_TEMP_ARGS="$EXTRA_BAD_TEMP_ARGS --silent-if-ok"
+    elif [ "@$var" = "@-f" ]; then
+        EXTRA_GET_TEMP_ARGS="$EXTRA_BAD_TEMP_ARGS -f"
+    else
+        echo "unknown argument: $var"
+        usage
+        exit 1
+    fi
+    ANY_ARGS=true
+done
+
+if [ "@$ANY_ARGS" = "@false" ]; then
+    usage
 fi
 
 if [ ! -f "`command -v virtualenv`" ]; then
@@ -15,7 +40,7 @@ if [ ! -f "`command -v virtualenv`" ]; then
 fi
 
 if [ -d "$THIS_VENV" ]; then
-    source $THIS_VENV/bin/activate
+    source $ACTIVATOR
     python -c "import temperusb"
     if [ $? -ne 0 ]; then
         cat << END
@@ -29,7 +54,7 @@ fi
 if [ ! -d "$THIS_VENV" ]; then
     python -m virtualenv "$THIS_VENV"
 fi
-ACTIVATOR=$THIS_VENV/bin/activate
+
 source $ACTIVATOR
 if [ $? -ne 0 ]; then
     echo
@@ -87,7 +112,7 @@ END
     exit 4
 fi
 # python TemperatureSanitizer.py
-python TemperatureSanitizer_413d_2107.py
+python get_temp.py $EXTRA_GET_TEMP_ARGS
 TEMP_RESULT=$?
 if [ $TEMP_RESULT -ne 0 ]; then
     exit $TEMP_RESULT

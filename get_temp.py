@@ -13,11 +13,13 @@ Record for PC
 Laptop"](https://www.amazon.com/gp/product/B009YRP906/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1)
 
 
-This program uses https://github.com/urwen/temper as a library, so
-instead of calling temper.py which would run main, it does something
-similar to what the main function of that file does.
+This program uses ccwienk/temper https://github.com/ccwienk/temper as a
+library (or any fork of the unmaintained urwen/temper), so instead of
+calling temper.py which would run main, it does something similar to
+what the main function of that file does.
 '''
 
+import sys
 import getpass
 user = getpass.getuser()
 tryGroup = 'driverdev'
@@ -27,12 +29,23 @@ from temper import Temper
 tmpr = Temper()
 try:
     result = tmpr.read()
+    scale = "C"
+    for i in range(1, len(sys.argv)):
+        arg = sys.argv[i]
+        if arg == "-f":
+            scale = "F"
+
     if len(result) < 1:
         print("temper didn't find any devices.")
         exit(1)
     # print("result[0]['internal temperature']: {}"
     # "".format(result[0]['internal temperature']))
-    print("{} C".format(result[0]['internal temperature']))
+    from tempermgr import c_to_f
+    c = result[0]['internal temperature']
+    t = c
+    if scale.upper() == "F":
+        t = c_to_f(c)
+    print("{} {}".format(t, scale))
 except PermissionError as ex:
     print("You must run as root or add a udev rule such as via:")
     print('echo \'KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0664",'
