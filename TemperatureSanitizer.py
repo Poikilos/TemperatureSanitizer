@@ -110,13 +110,16 @@ incomplete_bakes = list()
 current_bake = TSBake()
 current_temperatures = list()
 warmup_seconds = 0
+no_dev_msg = '''
+No TEMPer device found.
+You must use a device supported by temperusb,
+otherwise you must wait until this program supports
+https://github.com/edorfaus/TEMPered
+(https://github.com/mreymann/temperx supports TEMPered)
+'''
+
 if len(tds) < 1:
-    msg = ("No TEMPer device found."
-           "You must use a device supported by temperusb,"
-           "otherwise you must wait until this program supports"
-           "https://github.com/edorfaus/TEMPered"
-           "(https://github.com/mreymann/temperx supports TEMPered)")
-    raise RuntimeError(msg)
+    raise RuntimeError(no_dev_msg)
 
 def main():
     print("interval_seconds: "+str(interval_seconds))

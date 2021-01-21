@@ -2,7 +2,7 @@
 if [ ! -d ~/venv ]; then
     mkdir -p ~/venv
 fi
-THIS_VENV=~/venv/temperusb
+THIS_VENV=~/venv/temper
 
 if [ ! -f "`command -v virtualenv`" ]; then
     INSTALL_CMD=dnf install -y

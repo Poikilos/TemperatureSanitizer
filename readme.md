@@ -1,5 +1,5 @@
 # TemperatureSanitizer
-TemperatureSanitizer detects when a minimum temperature is sustained for a minimum time. This program uses temperusb aka temper, and default settings are for killing bedbugs:
+TemperatureSanitizer detects when a minimum temperature is sustained for a minimum time. This program uses temperusb (a.k.a. temper) or ccwienk's temper for a wider range of devices, and default settings are for killing bedbugs:
 - 120 minutes (though 90 minutes is considered minimum)
 - 120 degrees fahrenheit (though 118 is considered minimum).
 
@@ -21,8 +21,11 @@ Conversions table for reference temperatures:
 
 
 ## Requirements
-* A TEMPerV1 compatible USB thermometer (can be ordered online)
-* temperusb library for python (if your python does not have temperusb is not installed yet, the program will detect that problem and instruct you how to correct that). Installing temperusb requires the temperusb whl file or an internet connection in order to follow those instructions displayed by this program.
+The scripts will detect missing dependencies and instruct you how to correct that
+- A TEMPer compatible USB thermometer (can be ordered online)
+  - TEMPerV1 for temperusb
+- [github.com/ccwienk/temper](https://github.com/ccwienk/temper) or another fork of urwen/temper (NOT the pypi package which is not for temperature sensors) or temperusb
+- The temperusb library for Python. Installing temperusb requires the temperusb whl file or an internet connection in order to follow those instructions displayed by this program.
 
 
 ## Usage
