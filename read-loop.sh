@@ -6,7 +6,7 @@ fi
 while [ true ]; do
     temp=`$CMD`
     if [ $? -ne 0 ]; then
-        echo "$CMD did not work."
+        echo "$CMD did not work: $temp"
         exit 1
     else
         echo $(date +"%F %T") " , " $temp
