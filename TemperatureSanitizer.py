@@ -8,7 +8,7 @@ except NameError:
     # Python 3
     pass
 
-from tempermgr import TemperMgr
+from tempermgr import TemperMgr, permission_help
 
 settings_howto_msg = (
     "# These settings are in the TemperatureSanitizer.py file and\n"
@@ -52,11 +52,14 @@ def main():
     print("#Please wait...")
     while (True):
         try:
-            mgr.iterate(callback=callback)
+            mgr.iterate(1, callback=callback)
         except StopIteration:
             break
+        except PermissionError:
+            print("PermissionError:")
+            permission_help()
+            break
         time.sleep(1)
-        mgr.warmTime += 1
 
     print("incomplete_{}s:".format(ptl))
     for bake in mgr.incomplete_bakes:

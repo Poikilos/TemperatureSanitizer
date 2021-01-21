@@ -53,8 +53,19 @@ opposite_operator[">="] = "<"
 def f_to_c(f):
     return (f - 32) / 1.8
 
+
 def c_to_f(c):
     return (c * 1.8) + 32
+
+
+def permission_help():
+    print("You must run with sudo, root, or add a udev rule via:")
+    print("sudo groupadd {}".format(tryGroup))
+    print('echo \'KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0664",'
+          ' GROUP="{}"\' | sudo tee /etc/udev/rules.d/'
+          '99-hidraw-permissions.rules'.format(tryGroup))
+    print('sudo usermod -a -G {} {}'.format(tryGroup, user))
+    print('sudo udevadm control --reload-rules')
 
 
 class TSBake:
@@ -105,6 +116,13 @@ class TemperDeviceMgr:
 
 
     def getTemp(self, deviceIndex=0):
+        '''
+        Get the current temperature of the given device.
+
+        raises:
+        PermissionError (see the permission_help function)
+        ValueError (bad settings['scale'])
+        '''
         if enable_temperusb:
             return self.tds[deviceIndex].get_temperature(
                 format=self.tempermgr.get('scale')
@@ -190,10 +208,40 @@ class TemperMgr:
         return False
 
     def getTemp(self, deviceIndex=0):
+        '''
+        Get the temperature of the given device.
+
+        raises:
+        PermissionError (see the permission_help function)
+        ValueError (if settings['scale'] is bad)
+        '''
         return self.devicemgr.getTemp(deviceIndex)
         # ^ uses device 0 by default
 
-    def iterate(self, callback=print):
+    def iterate(self, passed, callback=print):
+        '''
+        Read the temperature and accumulate data into timespans then
+        into bake(s).
+
+        This is not a real iterator nor generator.
+        Just run it every passed second(s) until it raises
+        StopIteration.
+
+        Sequential arguments:
+        passed -- This must be the number of seconds that passed since
+                  the previous call or no call to iterate. It should
+                  usually be the same for every call in the session,
+                  even the first call, since it represents the
+                  theoretical "slice" of time during which a temperature
+                  was present (inaccuracies with that practice are
+                  mitigated using an interval setting greater than
+                  passed).
+
+        Raises:
+        PermissionError (See the permission_help function)
+        ValueError (if settings['scale'] is bad)
+        StopIteration (if the bake is complete)
+        '''
         # try:
         this_temp = self.getTemp()
         '''
@@ -269,6 +317,7 @@ class TemperMgr:
             if len(self.complete_bakes) > 0:
                 print("#"+self.process_term+" is finished: ")
                 raise StopIteration
+        self.warmTime += passed
 
     def is_criteria_met(self, temperatures):
         # formerly is_criteria_met

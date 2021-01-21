@@ -47,9 +47,7 @@ try:
         t = c_to_f(c)
     print("{} {}".format(t, scale))
 except PermissionError as ex:
-    print("You must run with sudo, root, or add a udev rule via:")
-    print('echo \'KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0664",'
-          ' GROUP="{}"\' | sudo tee /etc/udev/rules.d/'
-          '99-hidraw-permissions.rules'.format(tryGroup))
-    print('sudo usermod -a -G {} {}'.format(tryGroup, user))
+    print("PermissionError:")
+    from tempermgr import permission_help
+    permission_help()
     exit(3)
