@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-
-try:
-    input=raw_input
-except NameError:
-    # Python 3
+import sys
+if sys.version_info.major >= 3:
     pass
+else:
+    input = raw_input
 
 
 install_msg = '''
@@ -35,12 +34,19 @@ _enable_temperusb = False
 if try_temperusb:
     try:
         from temperusb import TemperDevice, TemperHandler
-    except ImportError:
-        print(install_msg)
+    except ImportError as ex:
+        sys.stderr.write(str(ex)+"\n")
+        sys.stderr.write(install_msg+"\n")
+        sys.stderr.flush()
         _enable_temperusb = False
 
 
-from temper import Temper
+try:
+    from temper import Temper
+except ImportError as ex:
+    sys.stderr.write(str(ex)+"\n")
+    sys.stderr.write(install_msg+"\n")
+    sys.stderr.flush()
 
 no_dev_msg = '''
 No TEMPer device found.
