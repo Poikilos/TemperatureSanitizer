@@ -21,9 +21,10 @@ Please run the following commands in command line.
   # If are using a virtualenv such as creating using the
   # get_temp.sh script, there is no need to run any of these
   # install commands. Instead, run this script using
-  #   ~/venv/temper/bin/python
+  #   ~/.virtualenvs/temper/bin/python
   # OR activate the virtualenv before running via:
-  #   source ~/venv/temper/bin/activate
+  #   source ~/.virtualenvs/temper/bin/activate
+  #   # and leave out "--user" from the following commands in that case
 
 python -m pip install --user --upgrade pip
 python -m pip install --user --upgrade pip wheel
@@ -145,6 +146,8 @@ class TemperDeviceMgr:
                 format=self.tempermgr.get('scale')
             )
         devices = self.tmpr.read()
+        if len(devices) < 1:
+            raise RuntimeError("No TEMPer USB devices were detected.")
         c = devices[0]['internal temperature']
         if self.tempermgr.isF():
             return c_to_f(c)
